@@ -1,0 +1,298 @@
+@keyframes slideInBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutBottom {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+.modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: slideInBottom 300ms ease-out;
+}
+
+.modal_content {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-family: outfit;
+}
+
+.modal_title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.sign_in_form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form_group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.signInInput {
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #333;
+    outline: none;
+    background: #ffffff;
+    font-family: outfit;
+    width: 420px;
+}
+
+.sign_in_button {
+    background: #2baffc;
+    color: #fff;
+    padding: 10px 0;
+    border: none;
+    border-radius: 33px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 50%;
+    margin-top: 20px;
+    font-family: outfit;
+    align-self: center;
+}
+
+.sign_in_button:hover {
+    background: #1b8bd9;
+}
+
+.sign_up_text {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.sign_up_text a {
+    color: #2baffc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sign_up_text a:hover {
+    text-decoration: underline;
+}
+
+.close_button {
+    position: absolute;
+    top: 0px;
+    right: 25px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close_button:hover {
+    color: #ff0000;
+}
+
+@keyframes slideInBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutBottom {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+/* Overlay for the modal */
+.modal_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 33px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    animation: slideInBottom 300ms ease-out; /* Apply the animation */
+}
+
+/* Modal content box */
+.modal_content {
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    width: 500px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-family: outfit;
+}
+
+.modal_title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+/* Form layout */
+.sign_up_form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form_row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form_group {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+}
+
+.form_group label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+.signUpInput {
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #333;
+    outline: none;
+    background: #ffffff;
+    font-family: outfit;
+}
+
+/* Role selection */
+.role_group {
+    text-align: left;
+    font-size: 14px;
+}
+
+.roles label {
+    margin-right: 10px;
+    font-weight: normal;
+}
+
+/* Sign-up button */
+.sign_up_button {
+    background: #2baffc;
+    color: #fff;
+    padding: 10px 0;
+    border: none;
+    border-radius: 33px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 50%;
+    margin-top: 20px;
+    font-family: outfit;
+    align-self: center;
+}
+
+.sign_up_button:hover {
+    background: #1b8bd9;
+}
+
+/* Sign-in link */
+.sign_in_text {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.sign_in_text a {
+    color: #2baffc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sign_in_text a:hover {
+    text-decoration: underline;
+}
+
+.modal_content.exit {
+    animation: slideOutBottom 300ms ease-out forwards;
+}
+
+.close_button {
+    position: absolute;
+    top: 0px;
+    right: 25px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close_button:hover {
+    color: #ff0000;
+}
+
+.link_button {
+    background: none;
+    border: none;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0;
+}
+
+.link_button:hover {
+    color: darkblue; /* Optional: Slightly darker shade on hover */
+}
+
+.link_button:focus {
+    outline: none;
+    text-decoration: underline;
+}

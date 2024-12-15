@@ -1,0 +1,127 @@
+.container {
+    min-width: 60vw;
+    margin: 0 auto;
+    margin-top: 60px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.formGroup label {
+    font-weight: bold;
+    color: #555;
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+    border-color: #007bff;
+}
+
+.textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.questionSection {
+    background-color: #eef6ff;
+    padding: 15px;
+    border: 1px solid #007bff;
+    border-radius: 10px;
+}
+
+.questionSection h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #007bff;
+}
+
+.addQuestionButton {
+    padding: 10px 15px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.addQuestionButton:hover {
+    background-color: #0056b3;
+}
+
+.questionList {
+    margin-top: 20px;
+}
+
+.questionList h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.questionItem {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.submitButton {
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submitButton:hover {
+    background-color: #218838;
+}
+
+.error {
+    color: #d9534f;
+    font-weight: bold;
+    text-align: center;
+}

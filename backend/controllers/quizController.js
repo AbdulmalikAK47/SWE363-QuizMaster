@@ -167,9 +167,6 @@ exports.updateQuiz = async (req, res, next) => {
         next(error);
     }
 };
-const Quiz = require("../models/Quiz");
-const Question = require("../models/Question");
-const Grade = require("../models/Grade");
 
 // Delete a specific quiz and its related questions and grades
 exports.deleteQuiz = async (req, res, next) => {

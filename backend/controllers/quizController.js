@@ -167,8 +167,11 @@ exports.updateQuiz = async (req, res, next) => {
         next(error);
     }
 };
+const Quiz = require("../models/Quiz");
+const Question = require("../models/Question");
+const Grade = require("../models/Grade");
 
-// Delete a specific quiz
+// Delete a specific quiz and its related questions and grades
 exports.deleteQuiz = async (req, res, next) => {
     try {
         const quizId = req.params.quizId;
@@ -180,10 +183,15 @@ exports.deleteQuiz = async (req, res, next) => {
             return res.status(404).json({ message: "Quiz not found" });
         }
 
-        // Optionally, delete associated questions
+        // Delete associated questions
         await Question.deleteMany({ quiz: quizId });
 
-        res.status(200).json({ message: "Quiz deleted successfully" });
+        // Delete associated grades
+        await Grade.deleteMany({ quiz: quizId });
+
+        res.status(200).json({
+            message: "Quiz and its related data deleted successfully",
+        });
     } catch (error) {
         console.error("Error deleting quiz:", error.message);
         next(error);

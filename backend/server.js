@@ -32,7 +32,7 @@ app.use("/api/questions", questionRouters);
 // --- SERVE FRONTEND STATIC FILES ---
 // __dirname in this file (backend/server.js) is the absolute path to the 'backend' directory.
 // We need to go up one level ('..') then into 'frontend' and then into 'build'.
-const frontendBuildPath = path.join(__dirname, "..", "frontend", "build");
+const frontendBuildPath = path.join(__dirname, "..", "frontend", "dist");
 console.log(`[Server] Serving static files from: ${frontendBuildPath}`); // For debugging
 
 // Serve static assets (JS, CSS, images, etc.) from the 'build' folder

@@ -13,6 +13,7 @@ const History = () => {
     const [quizStats, setQuizStats] = useState({});
     const [questionsMap, setQuestionsMap] = useState({});
 
+    // Effect for authentication and fetching initial history
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -20,7 +21,32 @@ const History = () => {
         } else {
             fetchHistory(token);
         }
-    }, [navigate]);
+    }, [navigate]); // navigate is a dependency for this effect
+
+    // Effect to handle browser back button navigation
+    useEffect(() => {
+        // Push a new state to the history stack when the component mounts.
+        // This ensures that when the user clicks 'back', our popstate listener is triggered first.
+        window.history.pushState(null, "", window.location.href);
+
+        const handleBrowserBack = (event) => {
+            // When the popstate event fires (due to back button from our pushed state),
+            // navigate to /welcome.
+            navigate("/welcome");
+        };
+
+        window.addEventListener("popstate", handleBrowserBack);
+
+        // Cleanup: remove the event listener when the component unmounts.
+        return () => {
+            window.removeEventListener("popstate", handleBrowserBack);
+            // Note: If the user navigates away by means other than the back button
+            // (e.g., clicking a link), this cleanup runs, and the pushed state
+            // might remain in the browser's history, which is generally harmless.
+            // If they used the back button, they'd be redirected by handleBrowserBack
+            // before this cleanup fully matters for the current navigation action.
+        };
+    }, [navigate]); // navigate is a dependency for this effect
 
     const fetchHistory = async (token) => {
         try {
@@ -31,7 +57,7 @@ const History = () => {
                 }
             );
 
-            const fetchedHistory = response.data.reverse(); // Reverse the order of history
+            const fetchedHistory = response.data.reverse();
             setHistory(fetchedHistory);
             calculateGlobalStats(fetchedHistory, token);
         } catch (err) {
@@ -42,14 +68,19 @@ const History = () => {
         }
     };
 
-    const calculateGlobalStats = async (history, token) => {
+    const calculateGlobalStats = async (historyData, token) => {
+        // Renamed history to historyData to avoid conflict
         const stats = {};
-        for (const quiz of history) {
-            const quizId = quiz.quiz?._id; // Use optional chaining to safely access _id
+        for (const quizRecord of historyData) {
+            // Renamed quiz to quizRecord
+            const quizId = quizRecord.quiz?._id;
 
             if (!quizId) {
-                console.warn(`Quiz ID is missing for history item:`, quiz);
-                continue; // Skip this iteration if quizId is missing
+                console.warn(
+                    `Quiz ID is missing for history item:`,
+                    quizRecord
+                );
+                continue;
             }
 
             try {
@@ -58,7 +89,6 @@ const History = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 stats[quizId] = response.data;
-                console.log(stats[quizId]);
             } catch (error) {
                 console.error(
                     `Failed to fetch stats for quiz ${quizId}:`,
@@ -66,7 +96,7 @@ const History = () => {
                 );
             }
         }
-        setQuizStats(stats); // Ensure stats are updated after the loop
+        setQuizStats(stats);
     };
 
     const fetchQuestionsForQuiz = async (quizId, token) => {
@@ -88,13 +118,16 @@ const History = () => {
 
     const toggleDetails = async (quizId) => {
         const token = localStorage.getItem("token");
+        if (!token) {
+            // Added token check for safety, though should be authed
+            navigate("/");
+            return;
+        }
 
-        // Fetch questions only if not already fetched
         if (!questionsMap[quizId]) {
             await fetchQuestionsForQuiz(quizId, token);
         }
 
-        // Toggle expandedQuizId for the clicked quiz
         setExpandedQuizId((prevQuizId) =>
             prevQuizId === quizId ? null : quizId
         );
@@ -130,17 +163,22 @@ const History = () => {
             <div className={styles.historyMain}>
                 <h1 className={styles.title}>Quiz History</h1>
                 <div className={styles.historyList}>
-                    {history.map((quiz) => {
-                        const quizId = quiz.quiz._id;
-                        const quizTitle = quiz.quiz.title;
+                    {history.map((quizAttempt) => {
+                        // Renamed quiz to quizAttempt for clarity
+                        const quizId = quizAttempt.quiz?._id; // Use optional chaining
+                        const quizTitle =
+                            quizAttempt.quiz?.title || "Unknown Quiz"; // Default title
                         const stats = quizStats[quizId] || {
                             average: 0,
                             median: 0,
                         };
                         const questions = questionsMap[quizId] || [];
-                        const quizScore = quiz.score / quiz.totalQuestions;
                         const quizScorePercentage =
-                            (quiz.score / quiz.totalQuestions) * 100;
+                            quizAttempt.totalQuestions > 0
+                                ? (quizAttempt.score /
+                                      quizAttempt.totalQuestions) *
+                                  100
+                                : 0;
 
                         const scoreStyle =
                             quizScorePercentage > stats.average
@@ -163,8 +201,25 @@ const History = () => {
                                 ? styles.textBelowAverage
                                 : styles.textOnAverage;
 
+                        // Guard against missing quizId before rendering card content that depends on it
+                        if (!quizId) {
+                            return (
+                                <div
+                                    key={quizAttempt._id || Math.random()}
+                                    className={styles.quizCard}
+                                >
+                                    <p className={styles.error}>
+                                        Quiz data is incomplete for this entry.
+                                    </p>
+                                </div>
+                            );
+                        }
+
                         return (
-                            <div key={quiz._id} className={styles.quizCard}>
+                            <div
+                                key={quizAttempt._id}
+                                className={styles.quizCard}
+                            >
                                 <div className={styles.quizHeader}>
                                     <h3 className={styles.quizTitle}>
                                         {quizTitle}
@@ -172,24 +227,24 @@ const History = () => {
                                     <p className={styles.quizDate}>
                                         Taken on:{" "}
                                         {new Date(
-                                            quiz.createdAt
+                                            quizAttempt.createdAt
                                         ).toLocaleDateString()}
                                     </p>
                                     <p
                                         className={`${styles.quizScore} ${scoreStyle}`}
                                     >
-                                        Score: {quiz.score}/
-                                        {quiz.totalQuestions} (
-                                        {(quizScore * 100).toFixed(2)}%)
+                                        Score: {quizAttempt.score}/
+                                        {quizAttempt.totalQuestions} (
+                                        {quizScorePercentage.toFixed(2)}%)
                                     </p>
                                     <p className={styles.stats}>
                                         Average:{" "}
                                         <span className={scoreStyle}>
-                                            {stats.average?.toFixed(2)}%{" "}
-                                            {/* Directly use average */}
+                                            {stats.average?.toFixed(2) ?? "N/A"}
+                                            %{" "}
                                         </span>{" "}
-                                        | Median: {stats.median?.toFixed(2)}%{" "}
-                                        {/* Directly use median */}
+                                        | Median:{" "}
+                                        {stats.median?.toFixed(2) ?? "N/A"}%{" "}
                                     </p>
                                     <p className={`${comparisonTextStyle}`}>
                                         {comparisonText}
@@ -207,7 +262,7 @@ const History = () => {
                                     <div className={styles.details}>
                                         <h4>Answers:</h4>
                                         <ul className={styles.answerList}>
-                                            {quiz.answers.map(
+                                            {quizAttempt.answers.map(
                                                 (answer, index) => {
                                                     const question =
                                                         questions.find(

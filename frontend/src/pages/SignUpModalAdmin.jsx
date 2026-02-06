@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import "../styles/SignUpModal.css";
 
 function SignUpModalAdmin({ onClose }) {
@@ -21,7 +22,7 @@ function SignUpModalAdmin({ onClose }) {
             ...prev,
             [name]: value,
         }));
-        setError(null); // Clear error on user input
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
@@ -37,7 +38,6 @@ function SignUpModalAdmin({ onClose }) {
             confirmPassword,
         } = formData;
 
-        // Validation checks
         if (
             !firstName ||
             !lastName ||
@@ -60,7 +60,6 @@ function SignUpModalAdmin({ onClose }) {
             return;
         }
 
-        // Fixed role as "quizMaker" (admin)
         const adminData = {
             firstName,
             lastName,
@@ -71,19 +70,18 @@ function SignUpModalAdmin({ onClose }) {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/auth/register", // Admin endpoint
+                `${API_BASE_URL}/api/auth/register`,
                 adminData
             );
 
             if (response.status === 201) {
                 const { token } = response.data;
-                localStorage.setItem("token", token); // Save token
-                navigate("/welcome-admin"); // Navigate to admin page
+                localStorage.setItem("token", token);
+                navigate("/welcome-admin");
             }
         } catch (error) {
             if (error.response) {
                 const { status, data } = error.response;
-
                 if (status === 409) {
                     setError("Email is already registered.");
                 } else if (status === 400) {
@@ -101,37 +99,50 @@ function SignUpModalAdmin({ onClose }) {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content">
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button
                     className="close-button"
                     onClick={() => {
                         onClose();
                         navigate("/");
                     }}
-                >
-                    &times;
-                </button>
+                    aria-label="Close"
+                />
+
+                <div className="modal-icon modal-icon-blue">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+
                 <h2 className="modal-title">Admin Sign Up</h2>
+                <p className="modal-subtitle">Create an administrator account</p>
+
                 {error && <p className="error-text">{error}</p>}
+
                 <form className="sign-up-form" onSubmit={handleSubmit}>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="admin-first">First Name</label>
                             <input
+                                id="admin-first"
                                 type="text"
                                 className="signUpInput"
                                 name="firstName"
-                                placeholder="First Name"
+                                placeholder="John"
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="admin-last">Last Name</label>
                             <input
+                                id="admin-last"
                                 type="text"
                                 className="signUpInput"
                                 name="lastName"
-                                placeholder="Last Name"
+                                placeholder="Doe"
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 required
@@ -140,22 +151,26 @@ function SignUpModalAdmin({ onClose }) {
                     </div>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="admin-email">Email</label>
                             <input
+                                id="admin-email"
                                 type="email"
                                 className="signUpInput"
                                 name="email"
-                                placeholder="Email"
+                                placeholder="admin@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="admin-confirm-email">Confirm Email</label>
                             <input
+                                id="admin-confirm-email"
                                 type="email"
                                 className="signUpInput"
                                 name="confirmEmail"
-                                placeholder="Confirm Email"
+                                placeholder="Confirm email"
                                 value={formData.confirmEmail}
                                 onChange={handleChange}
                                 required
@@ -164,22 +179,26 @@ function SignUpModalAdmin({ onClose }) {
                     </div>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="admin-password">Password</label>
                             <input
+                                id="admin-password"
                                 type="password"
                                 className="signUpInput"
                                 name="password"
-                                placeholder="Password"
+                                placeholder="Create password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="admin-confirm-password">Confirm Password</label>
                             <input
+                                id="admin-confirm-password"
                                 type="password"
                                 className="signUpInput"
                                 name="confirmPassword"
-                                placeholder="Confirm Password"
+                                placeholder="Confirm password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 required
@@ -199,7 +218,7 @@ function ProtectedSignUpModalAdmin() {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [passwordInput, setPasswordInput] = useState("");
     const [error, setError] = useState(null);
-    const ADMIN_PASSWORD = "SecureAdmin123"; // Change this to your secure password
+    const ADMIN_PASSWORD = "SecureAdmin123";
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -207,23 +226,36 @@ function ProtectedSignUpModalAdmin() {
             setIsAuthorized(true);
         } else {
             setError("Incorrect password. Access denied.");
-            setPasswordInput(""); // Clear input field
+            setPasswordInput("");
         }
     };
 
     return (
         <div className="modal-overlay">
             {!isAuthorized ? (
-                <div className="modal-content">
-                    <h2 className="modal-title">Admin Page Protection</h2>
-                    <p>Enter the password to access this page:</p>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-icon modal-icon-yellow">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                    </div>
+
+                    <h2 className="modal-title">Admin Access</h2>
+                    <p className="protect-description">
+                        This page is restricted. Enter the admin password to continue.
+                    </p>
+
                     {error && <p className="error-text">{error}</p>}
-                    <form onSubmit={handlePasswordSubmit}>
+
+                    <form className="protect-form" onSubmit={handlePasswordSubmit}>
                         <div className="form-group">
+                            <label htmlFor="admin-access-pw">Password</label>
                             <input
+                                id="admin-access-pw"
                                 type="password"
                                 className="signUpInput"
-                                placeholder="Enter Password"
+                                placeholder="Enter admin password"
                                 value={passwordInput}
                                 onChange={(e) => {
                                     setPasswordInput(e.target.value);
@@ -233,7 +265,7 @@ function ProtectedSignUpModalAdmin() {
                             />
                         </div>
                         <button type="submit" className="sign-up-button">
-                            Submit
+                            Unlock
                         </button>
                     </form>
                 </div>

@@ -1,54 +1,13 @@
-/* Contact Us Page Styles 
-
-.contact-us-modal {
-    width: 90%;
-    max-width: 400px;
-    margin: auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    font-family: outfit;
+@keyframes fadeIn {
+    from { background-color: rgba(0, 0, 0, 0); }
+    to { background-color: rgba(0, 0, 0, 0.5); }
 }
 
-.contact-us-modal h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.contact-us-modal p {
-    font-size: 16px;
-    margin: 10px 0;
-}
-
-.contact-info a {
-    color: #1e90ff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.contact-info a:hover {
-    text-decoration: underline;
-}
-
-.back-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #1e90ff;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.back-button:hover {
-    background-color: #1c7ed6;
-}*/
-
-/* ContactUsModal.css */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -60,41 +19,46 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    animation: fadeIn 0.3s ease; /* Add animation */
+    animation: fadeIn 0.3s ease;
 }
 
 .contact-us-modal {
     width: 90%;
-    max-width: 450px;
+    max-width: 420px;
     background-color: #ffffff;
-    padding: 30px;
-    border-radius: 33px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 36px;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     text-align: center;
-    font-family: "Outfit", sans-serif;
-    animation: slideUp 0.3s ease; /* Add animation */
+    font-family: 'Inter', sans-serif;
+    animation: slideUp 0.3s ease;
+    border-top: 4px solid #F59E0B;
 }
 
 .contact-us-modal h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #2baffc;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: #2563EB;
 }
 
 .contact-us-modal p {
-    font-size: 16px;
-    color: #333333;
-    margin: 10px 0;
+    font-size: 0.95rem;
+    color: #4B5563;
+    margin: 8px 0;
 }
 
 .contact-info {
-    margin-top: 15px;
+    margin-top: 16px;
+    padding: 16px;
+    background: #EFF6FF;
+    border-radius: 10px;
 }
 
 .contact-info a {
-    color: #1e90ff;
-    text-decoration: none;
-    font-weight: 500;
+    color: #2563EB;
+    font-weight: 600;
 }
 
 .contact-info a:hover {
@@ -103,59 +67,27 @@
 
 .close-button-contact {
     margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #1e90ff;
+    padding: 10px 28px;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
     color: #ffffff;
     border: none;
-    border-radius: 33px;
+    border-radius: 9999px;
     cursor: pointer;
-    font-family: "Outfit", sans-serif;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .close-button-contact:hover {
-    background-color: #1c7ed6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        background-color: rgba(0, 0, 0, 0);
-    }
-    to {
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
     .contact-us-modal {
-        padding: 20px;
-        border-radius: 20px;
-    }
-
-    .contact-us-modal h2 {
-        font-size: 20px;
-    }
-
-    .contact-us-modal p {
-        font-size: 14px;
-    }
-
-    .close-button-contact {
-        font-size: 14px;
-        padding: 8px 16px;
+        padding: 24px;
+        margin: 0 16px;
     }
 }

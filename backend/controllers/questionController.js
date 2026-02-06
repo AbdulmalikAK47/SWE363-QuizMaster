@@ -15,7 +15,6 @@ exports.getQuestions = async (req, res, next) => {
 
         res.status(200).json(questions);
     } catch (error) {
-        console.error("Error fetching questions:", error.message);
         next(error);
     }
 };
@@ -39,7 +38,6 @@ exports.createQuestion = async (req, res, next) => {
         const savedQuestion = await newQuestion.save();
         res.status(201).json(savedQuestion);
     } catch (error) {
-        console.error("Error creating question:", error.message);
         next(error);
     }
 };
@@ -61,7 +59,6 @@ exports.updateQuestion = async (req, res, next) => {
 
         res.status(200).json(question);
     } catch (error) {
-        console.error("Error updating question:", error.message);
         next(error);
     }
 };
@@ -79,7 +76,6 @@ exports.deleteQuestion = async (req, res, next) => {
 
         res.status(200).json({ message: "Question deleted successfully." });
     } catch (error) {
-        console.error("Error deleting question:", error.message);
         next(error);
     }
 };

@@ -2,77 +2,18 @@ const Grade = require("../models/Grade");
 const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
 
-// Submit a grade for a quiz
-exports.submitGrade = async (req, res, next) => {
-    try {
-        const { score, totalQuestions, answers } = req.body;
-
-        if (!score || !totalQuestions || !Array.isArray(answers)) {
-            return res.status(400).json({ message: "Invalid input data" });
-        }
-
-        const quizId = req.params.quizId;
-
-        // Check if the quiz exists
-        const quiz = await Quiz.findById(quizId);
-        if (!quiz) {
-            return res.status(404).json({ message: "Quiz not found" });
-        }
-
-        // Fetch all questions for the quiz
-        const questions = await Question.find({ quiz: quizId });
-        if (!questions || questions.length === 0) {
-            return res
-                .status(404)
-                .json({ message: "No questions found for this quiz." });
-        }
-
-        // Validate answers
-        const questionIds = questions.map((q) => q._id.toString());
-        const invalidAnswers = answers.filter(
-            (ans) => !questionIds.includes(ans.questionId)
-        );
-
-        if (invalidAnswers.length > 0) {
-            return res.status(400).json({
-                message: "Some answers do not belong to this quiz.",
-                invalidAnswers,
-            });
-        }
-
-        // Save the grade
-        const grade = new Grade({
-            user: req.user.id, // User ID from auth middleware
-            quiz: quizId,
-            score,
-            totalQuestions,
-            answers,
-        });
-
-        await grade.save();
-
-        res.status(201).json({
-            message: "Grade submitted successfully",
-            grade,
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
 // Fetch quiz history for a user
 exports.getQuizHistory = async (req, res, next) => {
     try {
         const history = await Grade.find({ user: req.user.id })
             .populate({
                 path: "quiz",
-                select: "title description level type", // Fetch specific quiz fields
+                select: "title description level type",
             })
             .exec();
 
         res.status(200).json(history);
     } catch (error) {
-        console.error("Error fetching quiz history:", error.message);
         next(error);
     }
 };
@@ -82,7 +23,6 @@ exports.getQuizzesStatus = async (req, res, next) => {
     try {
         const quizId = req.params.quizId;
 
-        // Fetch all grades for the specified quiz
         const grades = await Grade.find({ quiz: quizId });
 
         if (!grades.length) {
@@ -91,16 +31,13 @@ exports.getQuizzesStatus = async (req, res, next) => {
             });
         }
 
-        // Calculate scores as percentages
         const scores = grades.map(
             (grade) => (grade.score / grade.totalQuestions) * 100 || 0
         );
 
-        // Calculate average
         const average =
             scores.reduce((sum, score) => sum + score, 0) / scores.length;
 
-        // Calculate median
         const sortedScores = scores.sort((a, b) => a - b);
         const mid = Math.floor(sortedScores.length / 2);
         const median =
@@ -108,14 +45,12 @@ exports.getQuizzesStatus = async (req, res, next) => {
                 ? sortedScores[mid]
                 : (sortedScores[mid - 1] + sortedScores[mid]) / 2;
 
-        // Return stats
         res.status(200).json({
-            average: parseFloat(average.toFixed(2)), // Already a percentage
-            median: parseFloat(median.toFixed(2)), // Already a percentage
-            takers: grades.length, // Number of quiz takers
+            average: parseFloat(average.toFixed(2)),
+            median: parseFloat(median.toFixed(2)),
+            takers: grades.length,
         });
     } catch (error) {
-        console.error("Error fetching quiz stats:", error.message);
         next(error);
     }
 };
@@ -125,22 +60,21 @@ exports.getQuizStats = async (req, res, next) => {
         const stats = await Quiz.aggregate([
             {
                 $lookup: {
-                    from: "grades", // Join with grades collection
-                    localField: "_id", // Match quiz ID
-                    foreignField: "quiz", // Match grades by quiz field
+                    from: "grades",
+                    localField: "_id",
+                    foreignField: "quiz",
                     as: "grades",
                 },
             },
             {
                 $addFields: {
-                    // Calculate scores as percentages: (score / totalQuestions) * 100
                     scoresArray: {
                         $map: {
                             input: "$grades",
                             as: "grade",
                             in: {
                                 $cond: [
-                                    { $gt: ["$$grade.totalQuestions", 0] }, // Ensure totalQuestions > 0
+                                    { $gt: ["$$grade.totalQuestions", 0] },
                                     {
                                         $multiply: [
                                             {
@@ -152,28 +86,26 @@ exports.getQuizStats = async (req, res, next) => {
                                             100,
                                         ],
                                     },
-                                    0, // Default to 0 if totalQuestions is 0
+                                    0,
                                 ],
                             },
                         },
                     },
-                    takers: { $size: "$grades" }, // Number of takers
+                    takers: { $size: "$grades" },
                 },
             },
             {
                 $addFields: {
-                    // Calculate average score as percentage
                     average: {
                         $cond: [
                             { $gt: [{ $size: "$scoresArray" }, 0] },
                             { $avg: "$scoresArray" },
-                            0, // Default to 0 if no scores exist
+                            0,
                         ],
                     },
-                    // Calculate median score as percentage
                     median: {
                         $cond: [
-                            { $gt: [{ $size: "$scoresArray" }, 0] }, // If scores exist
+                            { $gt: [{ $size: "$scoresArray" }, 0] },
                             {
                                 $arrayElemAt: [
                                     {
@@ -199,7 +131,7 @@ exports.getQuizStats = async (req, res, next) => {
                                     0,
                                 ],
                             },
-                            0, // Default median to 0 if no scores exist
+                            0,
                         ],
                     },
                 },
@@ -217,7 +149,58 @@ exports.getQuizStats = async (req, res, next) => {
 
         res.status(200).json(stats);
     } catch (error) {
-        console.error("Error fetching quiz statistics:", error.message);
+        next(error);
+    }
+};
+
+// Dashboard stats for the logged-in user
+exports.getDashboardStats = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        const grades = await Grade.find({ user: userId }).populate({
+            path: "quiz",
+            select: "title level type",
+        });
+
+        const totalQuizzesTaken = grades.length;
+
+        if (totalQuizzesTaken === 0) {
+            return res.status(200).json({
+                totalQuizzesTaken: 0,
+                averageScore: 0,
+                bestScore: 0,
+                recentQuizzes: [],
+            });
+        }
+
+        const scores = grades.map(
+            (g) => (g.score / g.totalQuestions) * 100
+        );
+        const averageScore =
+            scores.reduce((sum, s) => sum + s, 0) / scores.length;
+        const bestScore = Math.max(...scores);
+
+        const recentQuizzes = grades
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice(0, 5)
+            .map((g) => ({
+                quiz: g.quiz,
+                score: g.score,
+                totalQuestions: g.totalQuestions,
+                percentage: parseFloat(
+                    ((g.score / g.totalQuestions) * 100).toFixed(2)
+                ),
+                date: g.createdAt,
+            }));
+
+        res.status(200).json({
+            totalQuizzesTaken,
+            averageScore: parseFloat(averageScore.toFixed(2)),
+            bestScore: parseFloat(bestScore.toFixed(2)),
+            recentQuizzes,
+        });
+    } catch (error) {
         next(error);
     }
 };

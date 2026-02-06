@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import "../styles/SignInModal.css";
 
 function SignInModal({ onClose, openModal }) {
@@ -11,9 +12,8 @@ function SignInModal({ onClose, openModal }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); // Clear error on submit
+        setError(null);
 
-        // Basic validation before sending the request
         if (!email || !password) {
             setError("Please fill in both email and password.");
             return;
@@ -21,28 +21,23 @@ function SignInModal({ onClose, openModal }) {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/auth/login",
+                `${API_BASE_URL}/api/auth/login`,
                 { email, password }
             );
 
             if (response.status === 200) {
                 const { role, token } = response.data;
-
-                // Save the token to localStorage
                 localStorage.setItem("token", token);
 
-                // Redirect based on user role
                 if (role === "quizMaker") {
-                    navigate("/welcome-admin"); // Redirect makers to admin welcome page
+                    navigate("/welcome-admin");
                 } else if (role === "quizTaker") {
-                    navigate("/welcome"); // Redirect takers to regular welcome page
+                    navigate("/welcome");
                 }
             }
         } catch (error) {
             if (error.response) {
                 const { status, data } = error.response;
-
-                // Specific error handling for server responses
                 if (status === 401) {
                     setError("Invalid email or password.");
                 } else if (status === 400) {
@@ -67,49 +62,64 @@ function SignInModal({ onClose, openModal }) {
                         onClose();
                         navigate("/");
                     }}
-                >
-                    &times;
-                </button>
-                <h2 className="modal-title">Sign in</h2>
+                    aria-label="Close"
+                />
+
+                <div className="modal-icon modal-icon-yellow">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                </div>
+
+                <h2 className="modal-title">Welcome Back</h2>
+                <p className="modal-subtitle">Sign in to continue your learning journey</p>
+
                 {error && <p className="error-text">{error}</p>}
+
                 <form className="sign-up-form" onSubmit={handleSubmit}>
-                    <div className="form-row">
-                        <div className="form-group">
-                            <input
-                                type="email"
-                                className="signUpInput"
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    setError(null); // Clear error when typing
-                                }}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <input
-                                type="password"
-                                className="signUpInput"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    setError(null); // Clear error when typing
-                                }}
-                                required
-                            />
-                        </div>
+                    <div className="form-group">
+                        <label htmlFor="signin-email">Email</label>
+                        <input
+                            id="signin-email"
+                            type="email"
+                            className="signUpInput"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                setError(null);
+                            }}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="signin-password">Password</label>
+                        <input
+                            id="signin-password"
+                            type="password"
+                            className="signUpInput"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                setError(null);
+                            }}
+                            required
+                        />
                     </div>
                     <button type="submit" className="sign-up-button">
-                        Sign in
+                        Sign In
                     </button>
+                    <div className="modal-divider">or</div>
                     <p className="sign-in-text">
                         Don&apos;t have an account?{" "}
                         <button
+                            type="button"
                             onClick={openModal}
                             className="link-button"
-                            aria-label="Open Sign In Modal"
+                            aria-label="Open Sign Up Modal"
                         >
                             Sign up
                         </button>

@@ -1,13 +1,13 @@
 import style from "../styles/End-style.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
 const End = ({ allQuestionsAnswered, quizId, selectedAnswers }) => {
     const navigate = useNavigate();
 
     const handleSubmit = async () => {
         if (!allQuestionsAnswered) return;
-        console.log("PASS");
         try {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -20,15 +20,8 @@ const End = ({ allQuestionsAnswered, quizId, selectedAnswers }) => {
                 (answer) => answer.isCorrect
             ).length;
 
-            console.log("Selected Answers:", selectedAnswers);
-            console.log("Selected Answers Length:", selectedAnswers.length);
-            console.log(
-                "Correct Answers Count:",
-                selectedAnswers.filter((answer) => answer.isCorrect).length
-            );
-
             await axios.post(
-                `http://localhost:5000/api/quizzes/${quizId}/grade`,
+                `${API_BASE_URL}/api/quizzes/${quizId}/grade`,
                 {
                     score,
                     totalQuestions,
@@ -40,7 +33,6 @@ const End = ({ allQuestionsAnswered, quizId, selectedAnswers }) => {
             );
             navigate("/history");
         } catch (error) {
-            console.error("Failed to submit grades:", error);
             alert("Something went wrong. Please try again later.");
         }
     };

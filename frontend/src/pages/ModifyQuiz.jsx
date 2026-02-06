@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import Header from "../components/Header";
 import styles from "../styles/CreateQuiz.module.css";
 
@@ -32,7 +33,7 @@ const ModifyQuiz = () => {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "http://localhost:5000/api/quizzes",
+                    `${API_BASE_URL}/api/quizzes`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setQuizList(response.data);
@@ -50,7 +51,7 @@ const ModifyQuiz = () => {
             const token = localStorage.getItem("token");
 
             const quizResponse = await axios.get(
-                `http://localhost:5000/api/quizzes/${quizId}`,
+                `${API_BASE_URL}/api/quizzes/${quizId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -149,7 +150,7 @@ const ModifyQuiz = () => {
             };
 
             await axios.put(
-                `http://localhost:5000/api/quizzes/${selectedQuizId}`,
+                `${API_BASE_URL}/api/quizzes/${selectedQuizId}`,
                 quizPayload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -159,12 +160,12 @@ const ModifyQuiz = () => {
                 questions.map((question) =>
                     question._id
                         ? axios.put(
-                              `http://localhost:5000/api/questions/${question._id}`,
+                              `${API_BASE_URL}/api/questions/${question._id}`,
                               question,
                               { headers: { Authorization: `Bearer ${token}` } }
                           )
                         : axios.post(
-                              `http://localhost:5000/api/questions`,
+                              `${API_BASE_URL}/api/questions`,
                               { ...question, quiz: selectedQuizId },
                               { headers: { Authorization: `Bearer ${token}` } }
                           )

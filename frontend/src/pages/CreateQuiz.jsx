@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import Header from "../components/Header";
 import styles from "../styles/CreateQuiz.module.css";
 
@@ -120,7 +121,7 @@ const CreateQuiz = () => {
             const payload = { ...quizData, questions };
 
             const response = await axios.post(
-                "http://localhost:5000/api/quizzes",
+                `${API_BASE_URL}/api/quizzes`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

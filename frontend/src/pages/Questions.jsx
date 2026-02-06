@@ -4,6 +4,9 @@ import Header from "../components/Header";
 import End from "../components/End";
 import style from "../styles/Questions.module.css";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
+
+const LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 const Questions = () => {
     const { quizId } = useParams();
@@ -17,7 +20,7 @@ const Questions = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) {
-            navigate("/"); // Redirect if not logged in
+            navigate("/");
         } else {
             fetchQuestions(token);
         }
@@ -26,13 +29,12 @@ const Questions = () => {
     const fetchQuestions = async (token) => {
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/quizzes/${quizId}/questions`,
+                `${API_BASE_URL}/api/quizzes/${quizId}/questions`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setQuestions(response.data);
-            setTitle(response.data[0]?.quizTitle || "Quiz"); // If title isn't fetched elsewhere
+            setTitle(response.data[0]?.quizTitle || "Quiz");
         } catch (error) {
-            console.error("Error fetching questions:", error.response || error);
             if (error.response) {
                 setError(
                     error.response.data.message || "Failed to load questions."
@@ -54,8 +56,10 @@ const Questions = () => {
         }));
     };
 
-    const allQuestionsAnswered =
-        Object.keys(selectedOptions).length === questions.length;
+    const answeredCount = Object.keys(selectedOptions).length;
+    const totalCount = questions.length;
+    const allQuestionsAnswered = answeredCount === totalCount;
+    const progressPercent = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
 
     const selectedAnswers = Object.keys(selectedOptions).map((questionId) => ({
         questionId,
@@ -66,76 +70,97 @@ const Questions = () => {
     }));
 
     if (loading) {
-        return <div className={style.loading}>Loading questions...</div>;
+        return (
+            <div className={style.loadingScreen}>
+                <div className={style.spinner} />
+                <p>Loading questions...</p>
+            </div>
+        );
     }
 
     if (error) {
-        return <div className={style.error}>{error}</div>;
+        return (
+            <div className={style.errorScreen}>
+                <div className={style.errorIcon}>!</div>
+                <p>{error}</p>
+                <button onClick={() => navigate("/welcome")} className={style.errorBtn}>
+                    Go Back
+                </button>
+            </div>
+        );
     }
 
     return (
         <>
-            <div className={style.question_main}>
-                <div className={style.question_title}>{title}</div>
-                {questions.map((question, index) => (
-                    <section key={question._id} className={style.question}>
-                        <div className={style.question_number}>
-                            <p className={style.question_number_text}>
-                                {`Question ${index + 1}`}
-                            </p>
-                            <p className={style.question_number_text}>
-                                {`${index + 1}/${questions.length}`}
-                            </p>
-                        </div>
-                        <div className={style.question_text}>
-                            {question.text}
-                        </div>
-                        <div className={style.field}>
-                            {question.choices.map((choice) => (
-                                <button
-                                    key={choice.id}
-                                    type="button"
-                                    className={`${style.field_choise} ${
-                                        selectedOptions[question._id] ===
-                                        choice.id
-                                            ? style.selected
-                                            : ""
-                                    }`}
-                                    onClick={() =>
-                                        handleOptionChange(
-                                            question._id,
-                                            choice.id
-                                        )
-                                    }
-                                >
-                                    <input
-                                        type="radio"
-                                        name={`question-${question._id}`}
-                                        value={choice.id}
-                                        id={`${question._id}-${choice.id}`}
-                                        checked={
-                                            selectedOptions[question._id] ===
-                                            choice.id
-                                        }
-                                        onChange={() =>
-                                            handleOptionChange(
-                                                question._id,
-                                                choice.id
-                                            )
-                                        }
-                                    />
-                                    <label
-                                        htmlFor={`${question._id}-${choice.id}`}
-                                        className={style.field_choise_text}
-                                    >
-                                        {choice.text}
-                                    </label>
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-                ))}
+            <Header />
+            <div className={style.progressBar}>
+                <div
+                    className={style.progressFill}
+                    style={{ width: `${progressPercent}%` }}
+                />
             </div>
+
+            <div className={style.quizContainer}>
+                <div className={style.quizHeader}>
+                    <h1 className={style.quizTitle}>{title}</h1>
+                    <span className={style.quizMeta}>
+                        {answeredCount} of {totalCount} answered
+                    </span>
+                </div>
+
+                <div className={style.questionsList}>
+                    {questions.map((question, index) => {
+                        const isAnswered = selectedOptions[question._id] !== undefined;
+                        return (
+                            <section
+                                key={question._id}
+                                className={`${style.questionCard} ${isAnswered ? style.questionCardAnswered : ""}`}
+                            >
+                                <div className={style.questionTop}>
+                                    <span className={style.questionBadge}>
+                                        {index + 1} / {totalCount}
+                                    </span>
+                                    {isAnswered && (
+                                        <span className={style.answeredCheck}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </span>
+                                    )}
+                                </div>
+
+                                <p className={style.questionText}>
+                                    {question.text}
+                                </p>
+
+                                <div className={style.choicesGrid}>
+                                    {question.choices.map((choice, ci) => {
+                                        const isSelected = selectedOptions[question._id] === choice.id;
+                                        return (
+                                            <button
+                                                key={choice.id}
+                                                type="button"
+                                                className={`${style.choiceBtn} ${isSelected ? style.choiceSelected : ""}`}
+                                                onClick={() =>
+                                                    handleOptionChange(question._id, choice.id)
+                                                }
+                                            >
+                                                <span className={`${style.choiceLetter} ${isSelected ? style.choiceLetterSelected : ""}`}>
+                                                    {LETTERS[ci]}
+                                                </span>
+                                                <span className={style.choiceText}>
+                                                    {choice.text}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        );
+                    })}
+                </div>
+            </div>
+
             <End
                 allQuestionsAnswered={allQuestionsAnswered}
                 quizId={quizId}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import Header from "../components/Header";
 import styles from "../styles/DeleteQuiz.module.css";
 
@@ -17,12 +18,12 @@ const DeleteQuiz = () => {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.get(
-                    "http://localhost:5000/api/quizzes",
+                    `${API_BASE_URL}/api/quizzes`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setQuizList(response.data);
             } catch (error) {
-                console.error("Failed to fetch quizzes:", error);
+                // console.error("Failed to fetch quizzes:", error);
                 setError("Failed to load quizzes. Please try again later.");
             }
         };
@@ -47,7 +48,7 @@ const DeleteQuiz = () => {
         try {
             const token = localStorage.getItem("token");
             await axios.delete(
-                `http://localhost:5000/api/quizzes/${selectedQuizId}`,
+                `${API_BASE_URL}/api/quizzes/${selectedQuizId}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -60,7 +61,7 @@ const DeleteQuiz = () => {
             setSuccessMessage("Quiz deleted successfully!");
             setError(null);
         } catch (error) {
-            console.error("Failed to delete quiz:", error);
+            // console.error("Failed to delete quiz:", error);
             setError("Failed to delete the quiz. Please try again later.");
         }
     };

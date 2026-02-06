@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 
-module.exports = (req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).json({ message: "Invalid ID format" });
+const validateObjectId = (paramName) => (req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params[paramName])) {
+        return res
+            .status(400)
+            .json({ message: `Invalid ${paramName} format` });
     }
     next();
 };
+
+module.exports = validateObjectId;

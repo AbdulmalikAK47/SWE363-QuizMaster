@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
 import "../styles/SignUpModal.css";
 
 function SignUpModal({ onClose, openModal }) {
@@ -21,7 +22,7 @@ function SignUpModal({ onClose, openModal }) {
             ...prev,
             [name]: value,
         }));
-        setError(null); // Clear error on user input
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
@@ -37,7 +38,6 @@ function SignUpModal({ onClose, openModal }) {
             confirmPassword,
         } = formData;
 
-        // Validation checks
         if (
             !firstName ||
             !lastName ||
@@ -61,12 +61,11 @@ function SignUpModal({ onClose, openModal }) {
         }
 
         try {
-            // Default role to 'quizTaker'
             const response = await axios.post(
-                "http://localhost:5000/api/auth/register",
+                `${API_BASE_URL}/api/auth/register`,
                 {
                     ...formData,
-                    role: "quizTaker", // Automatically set role to 'quizTaker'
+                    role: "quizTaker",
                 }
             );
 
@@ -78,7 +77,6 @@ function SignUpModal({ onClose, openModal }) {
         } catch (error) {
             if (error.response) {
                 const { status, data } = error.response;
-
                 if (status === 409) {
                     setError("Email is already registered.");
                 } else if (status === 400) {
@@ -96,37 +94,53 @@ function SignUpModal({ onClose, openModal }) {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content">
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button
                     className="close-button"
                     onClick={() => {
                         onClose();
                         navigate("/");
                     }}
-                >
-                    &times;
-                </button>
-                <h2 className="modal-title">Sign Up</h2>
+                    aria-label="Close"
+                />
+
+                <div className="modal-icon modal-icon-blue">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="8.5" cy="7" r="4" />
+                        <line x1="20" y1="8" x2="20" y2="14" />
+                        <line x1="23" y1="11" x2="17" y2="11" />
+                    </svg>
+                </div>
+
+                <h2 className="modal-title">Create Account</h2>
+                <p className="modal-subtitle">Join QuizMaster and start learning today</p>
+
                 {error && <p className="error-text">{error}</p>}
+
                 <form className="sign-up-form" onSubmit={handleSubmit}>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="signup-first">First Name</label>
                             <input
+                                id="signup-first"
                                 type="text"
                                 className="signUpInput"
                                 name="firstName"
-                                placeholder="First Name"
+                                placeholder="John"
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="signup-last">Last Name</label>
                             <input
+                                id="signup-last"
                                 type="text"
                                 className="signUpInput"
                                 name="lastName"
-                                placeholder="Last Name"
+                                placeholder="Doe"
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 required
@@ -135,22 +149,26 @@ function SignUpModal({ onClose, openModal }) {
                     </div>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="signup-email">Email</label>
                             <input
+                                id="signup-email"
                                 type="email"
                                 className="signUpInput"
                                 name="email"
-                                placeholder="Email"
+                                placeholder="you@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="signup-confirm-email">Confirm Email</label>
                             <input
+                                id="signup-confirm-email"
                                 type="email"
                                 className="signUpInput"
                                 name="confirmEmail"
-                                placeholder="Confirm Email"
+                                placeholder="Confirm email"
                                 value={formData.confirmEmail}
                                 onChange={handleChange}
                                 required
@@ -159,22 +177,26 @@ function SignUpModal({ onClose, openModal }) {
                     </div>
                     <div className="form-row">
                         <div className="form-group">
+                            <label htmlFor="signup-password">Password</label>
                             <input
+                                id="signup-password"
                                 type="password"
                                 className="signUpInput"
                                 name="password"
-                                placeholder="Password"
+                                placeholder="Create password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
+                            <label htmlFor="signup-confirm-password">Confirm Password</label>
                             <input
+                                id="signup-confirm-password"
                                 type="password"
                                 className="signUpInput"
                                 name="confirmPassword"
-                                placeholder="Confirm Password"
+                                placeholder="Confirm password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 required
@@ -182,11 +204,13 @@ function SignUpModal({ onClose, openModal }) {
                         </div>
                     </div>
                     <button type="submit" className="sign-up-button">
-                        Sign up
+                        Create Account
                     </button>
+                    <div className="modal-divider">or</div>
                     <p className="sign-in-text">
                         Already have an account?{" "}
                         <button
+                            type="button"
                             className="link_button"
                             onClick={openModal}
                             aria-label="Open Sign In Modal"

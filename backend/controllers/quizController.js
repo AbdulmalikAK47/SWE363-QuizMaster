@@ -29,7 +29,6 @@ exports.getQuizById = async (req, res, next) => {
             questions, // Dynamically fetched questions
         });
     } catch (error) {
-        console.error("Error fetching quiz:", error);
         next(error);
     }
 };
@@ -47,7 +46,6 @@ exports.getQuizQuestions = async (req, res, next) => {
 
         res.status(200).json(questions);
     } catch (error) {
-        console.error("Error fetching quiz questions:", error);
         next(error);
     }
 };
@@ -108,7 +106,6 @@ exports.submitQuizGrade = async (req, res, next) => {
             grade,
         });
     } catch (error) {
-        console.error("Error submitting quiz grade:", error.message);
         next(error);
     }
 };
@@ -141,8 +138,7 @@ exports.createQuiz = async (req, res, next) => {
 
         res.status(201).json({ message: "Quiz created successfully", quiz });
     } catch (error) {
-        console.error("Quiz creation failed:", error.message);
-        res.status(400).json({ message: "Invalid input data" });
+        next(error);
     }
 };
 
@@ -150,20 +146,35 @@ exports.createQuiz = async (req, res, next) => {
 exports.updateQuiz = async (req, res, next) => {
     try {
         const quizId = req.params.quizId;
-        const updates = req.body;
 
-        const quiz = await Quiz.findByIdAndUpdate(quizId, updates, {
-            new: true,
-            runValidators: true,
-        });
-
+        const quiz = await Quiz.findById(quizId);
         if (!quiz) {
             return res.status(404).json({ message: "Quiz not found" });
         }
 
-        res.status(200).json(quiz);
+        // Ownership check
+        if (quiz.createdBy.toString() !== req.user.id) {
+            return res
+                .status(403)
+                .json({ message: "You can only update your own quizzes" });
+        }
+
+        // Whitelist allowed fields
+        const allowed = ["title", "description", "level", "type"];
+        const updates = {};
+        for (const key of allowed) {
+            if (req.body[key] !== undefined) {
+                updates[key] = req.body[key];
+            }
+        }
+
+        const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, updates, {
+            new: true,
+            runValidators: true,
+        });
+
+        res.status(200).json(updatedQuiz);
     } catch (error) {
-        console.error("Error updating quiz:", error.message);
         next(error);
     }
 };
@@ -173,12 +184,18 @@ exports.deleteQuiz = async (req, res, next) => {
     try {
         const quizId = req.params.quizId;
 
-        // Find and delete the quiz
-        const deletedQuiz = await Quiz.findByIdAndDelete(quizId);
-
-        if (!deletedQuiz) {
+        // Ownership check
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
             return res.status(404).json({ message: "Quiz not found" });
         }
+        if (quiz.createdBy.toString() !== req.user.id) {
+            return res
+                .status(403)
+                .json({ message: "You can only delete your own quizzes" });
+        }
+
+        await Quiz.findByIdAndDelete(quizId);
 
         // Delete associated questions
         await Question.deleteMany({ quiz: quizId });
@@ -190,7 +207,6 @@ exports.deleteQuiz = async (req, res, next) => {
             message: "Quiz and its related data deleted successfully",
         });
     } catch (error) {
-        console.error("Error deleting quiz:", error.message);
         next(error);
     }
 };

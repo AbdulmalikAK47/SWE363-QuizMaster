@@ -31,12 +31,12 @@ function ContactUsModal({ onClose }) {
                 <div className="contact-info">
                     <p>
                         <strong>Email:</strong>{" "}
-                        <a href="mailto:support@quizmaster.com">
-                            support@quizmaster.com
+                        <a href="mailto:abdulmalikwaleed5@gmail.com">
+                            abdulmalikwaleed5@gmail.com
                         </a>
                     </p>
                     <p>
-                        <strong>Phone:</strong> +966520123890
+                        <strong>Phone:</strong> +966549660615
                     </p>
                 </div>
 

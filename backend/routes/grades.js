@@ -1,23 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
+const validateObjectId = require("../middlewares/validateObjectId");
 const {
-    submitGrade,
     getQuizHistory,
     getQuizzesStatus,
     getQuizStats,
+    getDashboardStats,
 } = require("../controllers/gradeController");
-
-// Submit grade for a quiz
-router.post("/:quizId/grade", authMiddleware, submitGrade);
 
 // Fetch quiz history for the logged-in user
 router.get("/history", authMiddleware, getQuizHistory);
 
-// Fetch global stats for a specific quiz
-router.get("/quiz-stats/:quizId", authMiddleware, getQuizzesStatus);
+// Dashboard stats for the logged-in user
+router.get("/dashboard-stats", authMiddleware, getDashboardStats);
 
-// Fetch quiz statistics
-router.get("/quiz-stats", getQuizStats);
+// Fetch quiz statistics (all quizzes)
+router.get("/quiz-stats", authMiddleware, getQuizStats);
+
+// Fetch global stats for a specific quiz
+router.get(
+    "/quiz-stats/:quizId",
+    authMiddleware,
+    validateObjectId("quizId"),
+    getQuizzesStatus
+);
 
 module.exports = router;

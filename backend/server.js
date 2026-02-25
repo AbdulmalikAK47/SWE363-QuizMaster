@@ -14,7 +14,7 @@ const app = express();
 // ✅ Proper CORS for Vercel frontend
 app.use(
     cors({
-        origin: "https://swe-363-quiz-master-kappa.vercel.app/",
+        origin: "https://swe-363-quiz-master-kappa.vercel.app",
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     }),

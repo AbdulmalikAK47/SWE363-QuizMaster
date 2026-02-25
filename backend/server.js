@@ -6,13 +6,20 @@ const authRoutes = require("./routes/auth");
 const quizRoutes = require("./routes/quizzes");
 const gradeRoutes = require("./routes/grades");
 const questionRoutes = require("./routes/questions");
-const path = require("path");
 
 connectDB();
 
 const app = express();
 
-app.use(cors());
+// ✅ Proper CORS for Vercel frontend
+app.use(
+    cors({
+        origin: "https://swe-363-quiz-master-kappa.vercel.app/",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    }),
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,23 +29,15 @@ app.use("/api/quizzes", quizRoutes);
 app.use("/api/grades", gradeRoutes);
 app.use("/api/questions", questionRoutes);
 
-// Global error handler (must be after API routes, before static serving)
+// Test route
+app.get("/", (req, res) => {
+    res.send("API Running");
+});
+
+// Global error handler
 app.use((error, req, res, next) => {
     console.error(error.message);
     res.status(500).json({ message: "An internal server error occurred" });
-});
-
-// Serve frontend static files
-const frontendBuildPath = path.join(__dirname, "..", "frontend", "dist");
-app.use(express.static(frontendBuildPath));
-
-// SPA fallback - serve index.html for all non-API routes
-app.get("*", (req, res) => {
-    res.sendFile(path.join(frontendBuildPath, "index.html"), (err) => {
-        if (err) {
-            res.status(500).send("Error serving frontend.");
-        }
-    });
 });
 
 const PORT = process.env.PORT || 5000;

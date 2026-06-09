@@ -94,7 +94,7 @@ function SignUpModal({ onClose, openModal }) {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content signup-modal" onClick={(e) => e.stopPropagation()}>
                 <button
                     className="close-button"
                     onClick={() => {

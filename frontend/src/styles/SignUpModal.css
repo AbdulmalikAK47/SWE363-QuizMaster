@@ -39,6 +39,12 @@
     overflow: hidden;
 }
 
+/* Scoped to the sign-up modal so SignInModal.css's identical global
+   classes can't override the two-column layout via import order. */
+.modal-content.signup-modal {
+    width: 480px;
+}
+
 /* gradient accent bar */
 .modal-content::before {
     content: '';
@@ -149,17 +155,19 @@
     gap: 14px;
 }
 
-.form-row {
+.signup-modal .form-row {
     display: flex;
+    flex-direction: row;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.form-group {
+.signup-modal .form-group {
     display: flex;
     flex-direction: column;
     flex: 1 1 140px;
     min-width: 0;
+    width: auto;
     position: relative;
 }
 

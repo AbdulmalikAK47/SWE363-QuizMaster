@@ -146,6 +146,8 @@ function SignUpModal({ onClose, openModal }) {
                                 required
                             />
                         </div>
+                    </div>
+                    <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="signup-email">Email</label>
                             <input
@@ -159,8 +161,6 @@ function SignUpModal({ onClose, openModal }) {
                                 required
                             />
                         </div>
-                    </div>
-                    <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="signup-confirm-email">Confirm Email</label>
                             <input
@@ -174,6 +174,8 @@ function SignUpModal({ onClose, openModal }) {
                                 required
                             />
                         </div>
+                    </div>
+                    <div className="form-row">
                         <div className="form-group">
                             <label htmlFor="signup-password">Password</label>
                             <input
